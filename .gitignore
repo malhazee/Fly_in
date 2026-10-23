@@ -1,0 +1,31 @@
+# Byte-compiled / optimized / DLL files
+__pycache__/
+*.py[cod]
+*$py.class
+
+# Caches and Type Checkers
+.mypy_cache/
+.pytest_cache/
+.ruff_cache/
+
+# Virtual Environments
+.venv/
+env/
+venv/
+ENV/
+
+# IDE & Editor files
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# Operating System files
+.DS_Store
+Thumbs.db
+
+# Project Scratch & Extraction files
+challenger_data.json
+*.pdf
+*.log
