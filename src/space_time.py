@@ -70,46 +70,52 @@ class SpaceTimeRouter:
                 current_zone = self.graph.zones[curr]
                 for neighbor, conn in self.graph.get_neighbors(current_zone):
                     nbr_name = neighbor.name
-                    transit_cost = neighbor.movement_cost
-                    arrival_t = t + transit_cost
-
-                    # Check link capacity during transit turns
                     conn_key = (
                         min(curr, nbr_name),
                         max(curr, nbr_name),
                     )
-                    edge_ok = True
-                    for dt in range(1, transit_cost + 1):
-                        if (
-                            conn_res.get((conn_key, t + dt), 0)
-                            >= conn.max_link_capacity
-                        ):
-                            edge_ok = False
-                            break
-                    if not edge_ok:
-                        continue
-
-                    # Check destination zone capacity upon arrival
                     nbr_cap = (
                         9999
                         if nbr_name == end_name
                         else neighbor.max_drones
                     )
-                    if zone_res.get((nbr_name, arrival_t), 0) >= nbr_cap:
-                        continue
-
                     is_prio = (
                         1
                         if neighbor.zone_type == ZoneType.PRIORITY
                         else 0
                     )
                     new_prio = (-neg_prio) + is_prio
-
-                    new_hist = hist + [(nbr_name, arrival_t)]
-                    heapq.heappush(
-                        heap,
-                        (arrival_t, -new_prio, nbr_name, new_hist),
-                    )
+                    if neighbor.zone_type == ZoneType.RESTRICTED:
+                        # Pipelined transit: t+1 on connection, t+2 in zone
+                        if (
+                            conn_res.get((conn_key, t + 1), 0)
+                            >= conn.max_link_capacity
+                        ):
+                            continue
+                        if zone_res.get((nbr_name, t + 2), 0) >= nbr_cap:
+                            continue
+                        new_hist = hist + [
+                            (f"{curr}-{nbr_name}", t + 1),
+                            (nbr_name, t + 2),
+                        ]
+                        heapq.heappush(
+                            heap,
+                            (t + 2, -new_prio, nbr_name, new_hist),
+                        )
+                    else:
+                        arr_t = t + 1
+                        if (
+                            conn_res.get((conn_key, arr_t), 0)
+                            >= conn.max_link_capacity
+                        ):
+                            continue
+                        if zone_res.get((nbr_name, arr_t), 0) >= nbr_cap:
+                            continue
+                        new_hist = hist + [(nbr_name, arr_t)]
+                        heapq.heappush(
+                            heap,
+                            (arr_t, -new_prio, nbr_name, new_hist),
+                        )
 
             if not best_schedule:
                 raise RuntimeError(
@@ -120,19 +126,29 @@ class SpaceTimeRouter:
             for i in range(len(best_schedule) - 1):
                 z_curr, t_curr = best_schedule[i]
                 z_next, t_next = best_schedule[i + 1]
-                if z_curr != z_next:
-                    conn_key = (
-                        min(z_curr, z_next),
-                        max(z_curr, z_next),
-                    )
-                    for dt in range(1, t_next - t_curr + 1):
-                        conn_res[(conn_key, t_curr + dt)] = (
-                            conn_res.get((conn_key, t_curr + dt), 0) + 1
+                if z_curr == z_next:
+                    if z_next != end_name and z_next != start_name:
+                        zone_res[(z_next, t_next)] = (
+                            zone_res.get((z_next, t_next), 0) + 1
                         )
-                if z_next != end_name and z_next != start_name:
-                    zone_res[(z_next, t_next)] = (
-                        zone_res.get((z_next, t_next), 0) + 1
+                    continue
+                if "-" in z_next and z_next not in self.graph.zones:
+                    # Connection reservation for restricted transit
+                    c_p = z_next.split("-")
+                    c_k = (min(c_p[0], c_p[1]), max(c_p[0], c_p[1]))
+                    conn_res[(c_k, t_next)] = (
+                        conn_res.get((c_k, t_next), 0) + 1
                     )
+                else:
+                    if "-" not in z_curr or z_curr in self.graph.zones:
+                        c_k = (min(z_curr, z_next), max(z_curr, z_next))
+                        conn_res[(c_k, t_next)] = (
+                            conn_res.get((c_k, t_next), 0) + 1
+                        )
+                    if z_next != end_name and z_next != start_name:
+                        zone_res[(z_next, t_next)] = (
+                            zone_res.get((z_next, t_next), 0) + 1
+                        )
 
             schedules.append(best_schedule)
 

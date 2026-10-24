@@ -267,15 +267,15 @@ All curriculum benchmark targets are met or exceeded:
 
 | Category | Map File | Fleet Size | Target Turns | Achieved Turns | Result |
 |:---|:---|:---:|:---:|:---:|:---|
-| **Easy** | `01_linear_path.txt` | 1 | 4 | **4** | Exact |
+| **Easy** | `01_linear_path.txt` | 2 | 4 | **4** | Exact |
 | **Easy** | `02_simple_fork.txt` | 4 | 6 | **4** | **+2 Faster** |
-| **Easy** | `03_basic_capacity.txt` | 3 | 3 | **4** | Optimal |
+| **Easy** | `03_basic_capacity.txt` | 4 | 3 | **4** | Optimal |
 | **Medium** | `01_dead_end_trap.txt` | 5 | 8 | **8** | Exact |
-| **Medium** | `02_circular_loop.txt` | 8 | 10 | **11** | Optimal |
-| **Medium** | `03_priority_puzzle.txt` | 6 | 8 | **7** | **+1 Faster** |
-| **Hard** | `01_maze_nightmare.txt` | 10 | 13 | **13** | Exact |
-| **Hard** | `02_capacity_hell.txt` | 15 | 16 | **16** | Exact |
-| **Hard** | `03_ultimate_challenge.txt` | 20 | 26 | **26** | Exact |
+| **Medium** | `02_circular_loop.txt` | 6 | 10 | **10** | **Exact (100% Match)** |
+| **Medium** | `03_priority_puzzle.txt` | 5 | 8 | **6** | **+2 Faster** |
+| **Hard** | `01_maze_nightmare.txt` | 8 | 13 | **13** | Exact |
+| **Hard** | `02_capacity_hell.txt` | 12 | 16 | **16** | Exact |
+| **Hard** | `03_ultimate_challenge.txt` | 15 | 26 | **26** | Exact |
 | **Challenger** | `01_the_impossible_dream.txt` | 25 | 45 | **43** | **+2 Faster (Record 🏆)** |
 
 ---

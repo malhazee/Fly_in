@@ -1,5 +1,5 @@
 from enum import Enum
-from typing import List, Optional
+from typing import List, Optional, Tuple
 
 
 class ZoneType(Enum):
@@ -32,6 +32,7 @@ class Zone:
         self.zone_type: ZoneType = zone_type
         self.color: Optional[str] = color
         self.max_drones: int = max_drones
+        self.transit_conn: Optional[Tuple[str, str]] = None
 
     @property
     def movement_cost(self) -> int:
@@ -103,6 +104,7 @@ class DroneState:
         self.wait_turns: int = 0
         self.start_turn: int = start_turn
         self.has_arrived: bool = False
+        self.transit_conn: Optional[Tuple[str, str]] = None
 
     @property
     def name(self) -> str:

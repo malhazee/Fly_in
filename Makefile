@@ -5,7 +5,7 @@ PYTHON := uv run python
 MAP ?= maps/easy/01_linear_path.txt
 DELAY ?= 2.0
 
-.PHONY: all install run visualize debug clean lint lint-strict test challenger challenger-vis help
+.PHONY: all install run visualize debug clean lint lint-strict test test-st challenger challenger-vis help
 all: run
 
 install:
@@ -39,10 +39,19 @@ lint-strict:
 	uv run mypy src/ --strict
 
 test:
-	@echo "=== Running Benchmarks on All Maps ==="
+	@echo "=== Running Benchmarks on All Maps (Standard) ==="
 	@for map in maps/*/*.txt; do \
-		echo "Testing $$map ..."; \
-		$(PYTHON) -m src.main "$$map" > /dev/null && echo "  -> PASSED" || echo "  -> FAILED"; \
+		echo -n "$$map ... "; \
+		turns=$$($(PYTHON) -m src.main "$$map" | wc -l); \
+		echo "-> $$turns turns"; \
+	done
+
+test-st:
+	@echo "=== Running Space-Time on All Maps ==="
+	@for map in maps/*/*.txt; do \
+		echo -n "$$map ... "; \
+		turns=$$($(PYTHON) -m src.main "$$map" --space-time | wc -l); \
+		echo "-> $$turns turns"; \
 	done
 
 challenger:
